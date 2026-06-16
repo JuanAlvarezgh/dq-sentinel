@@ -1,0 +1,15 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<title>Reporte de calidad de datos</title>
+<style>body{font-family:system-ui;margin:2rem}.aprobada{color:#1a7f37}.fallida{color:#c00}.error{color:#b35900}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:.4rem .6rem;text-align:left}</style>
+</head><body>
+<h1>Reporte de calidad de datos</h1>
+<p>Aprobadas: {{ aprobadas }} · Fallidas: {{ fallidas }} · Errores: {{ errores }}</p>
+<table><thead><tr><th>Tabla</th><th>Expectativa</th><th>Columna</th><th>Estado</th><th>Filas fallidas</th><th>Detalle</th></tr></thead>
+<tbody>{% for r in resultados %}
+<tr><td>{{ r.tabla }}</td><td>{{ r.expectativa }}</td><td>{{ r.columna or '-' }}</td>
+<td class="{{ r.estado }}">{{ r.estado }}</td><td>{{ r.filas_fallidas }}</td><td>{{ r.detalle }}</td></tr>
+{% endfor %}</tbody></table>
+{% if historico %}<h2>Historico de corridas</h2><table><thead><tr><th>Corrida</th><th>Aprobadas</th><th>Fallidas</th></tr></thead>
+<tbody>{% for h in historico %}<tr><td>{{ h.id_corrida }}</td><td>{{ h.aprobadas }}</td><td>{{ h.fallidas }}</td></tr>{% endfor %}</tbody></table>{% endif %}
+</body></html>

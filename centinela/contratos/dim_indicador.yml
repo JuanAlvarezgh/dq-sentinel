@@ -1,0 +1,11 @@
+tabla: dim_indicador
+descripcion: Dimensión de indicadores económicos con unidad de medida.
+expectativas:
+  - tipo: unico
+    columna: id_indicador
+  - tipo: valores_permitidos
+    columna: unidad
+    valores:
+      - USD
+      - porcentaje
+      - personas

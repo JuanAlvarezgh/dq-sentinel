@@ -1,0 +1,31 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: centinela
+          POSTGRES_PASSWORD: centinela
+          POSTGRES_DB: calidad
+        ports: ["5437:5432"]
+        options: >-
+          --health-cmd "pg_isready -U centinela -d calidad"
+          --health-interval 5s --health-retries 10
+
+    env:
+      PG_DSN: postgresql://centinela:centinela@localhost:5437/calidad
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements-dev.txt
+      - run: pip install -e .
+      - run: ruff check .
+      - run: pytest tests -v

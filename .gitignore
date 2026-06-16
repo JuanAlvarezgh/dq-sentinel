@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.venv_ci_test/
+.env
+*.html
+.pytest_cache/
+.ruff_cache/
+salida/
+dq_sentinel.egg-info/

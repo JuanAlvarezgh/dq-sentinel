@@ -1,0 +1,51 @@
+services:
+
+  # Base de datos Postgres — se levanta siempre
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: centinela
+      POSTGRES_PASSWORD: centinela
+      POSTGRES_DB: calidad
+    ports: ["5437:5432"]
+    volumes:
+      - ./seed:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U centinela -d calidad"]
+      interval: 5s
+      retries: 10
+
+  # Servicio principal: ejecuta todas las validaciones de calidad
+  centinela:
+    build: .
+    environment:
+      PG_DSN: postgresql://centinela:centinela@postgres:5432/calidad
+      # El webhook de Slack se inyecta desde el entorno del host; si está vacío la alerta
+      # se imprime en consola en lugar de enviarse a Slack
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Airflow (opcional) — solo se levanta con:
+  #   docker compose --profile airflow up
+  # No se incluye en el arranque por defecto porque es pesado y no es necesario
+  # para la demostración de las validaciones en sí.
+  airflow:
+    profiles: [airflow]
+    image: apache/airflow:2.10.2
+    command: standalone
+    environment:
+      # El DAG importa ejecutar.py; con PYTHONPATH apuntando al proyecto lo encuentra
+      PYTHONPATH: /opt/airflow/proyecto
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      PG_DSN: postgresql://centinela:centinela@postgres:5432/calidad
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+    ports: ["8080:8080"]
+    volumes:
+      - ./dags:/opt/airflow/dags
+      # Monta todo el proyecto para que ejecutar.py y el paquete centinela estén disponibles
+      - .:/opt/airflow/proyecto
+    depends_on:
+      postgres:
+        condition: service_healthy

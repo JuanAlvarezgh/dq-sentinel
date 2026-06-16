@@ -1,0 +1,23 @@
+tabla: hechos_valor_indicador
+descripcion: Hechos de valores de indicadores por país y año.
+expectativas:
+  - tipo: no_nulo
+    columna: valor
+  - tipo: rango
+    columna: anio
+    min: 1960
+    max: 2025
+  - tipo: integridad_referencial
+    columna: id_pais
+    tabla_referida: dim_pais
+    columna_referida: id_pais
+  - tipo: integridad_referencial
+    columna: id_indicador
+    tabla_referida: dim_indicador
+    columna_referida: id_indicador
+  - tipo: frescura
+    columna: cargado_en
+    max_horas: 48
+  - tipo: conteo_filas
+    min: 1
+    max: 100000

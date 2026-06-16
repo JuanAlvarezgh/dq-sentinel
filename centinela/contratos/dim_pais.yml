@@ -1,0 +1,13 @@
+tabla: dim_pais
+descripcion: Dimensión de países con código ISO y región geográfica.
+expectativas:
+  - tipo: unico
+    columna: id_pais
+  - tipo: no_nulo
+    columna: nombre
+  - tipo: patron
+    columna: codigo_iso
+    patron: ^[A-Z]{3}$
+  - tipo: conteo_filas
+    min: 1
+    max: 1000
